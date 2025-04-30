@@ -158,13 +158,12 @@ const App = () => {
             `Payment of $5.00 from ${paymentReference} has been verified.`
           );
         } else if (result.status === 202) {
-          // Pending
+          setLoading(true);
           console.log("Payment is still pending, continuing to poll.");
         } else if (result.status === "sent") {
-          // Sent
+          setLoading(true);
           console.log("Payment has been sent, awaiting confirmation.");
         } else if (result.status === 400) {
-          // Failed, Cancelled, or Unknown
           console.log(
             "Payment verification failed or cancelled:",
             result.message

@@ -2,6 +2,12 @@
   "expo": {
     "name": "hbc_App",
     "slug": "hbc_App",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "extra": {
+      "eas": {
+        "projectId": "e320afae-51c7-4794-a68b-b393751e4564"
+      }
+    },
+    "owner": "tawandachapaguta"
   }
 }
