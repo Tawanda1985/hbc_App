@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -28,7 +28,6 @@ import * as Sharing from "expo-sharing";
 const { width, height } = Dimensions.get("window");
 
 const App = () => {
-  // console.log('RNFS:', RNFS);
   const [language, setLanguage] = useState("en");
   const [problemType, setProblemType] = useState("");
   const [affectedArea, setAffectedArea] = useState("");
@@ -44,6 +43,7 @@ const App = () => {
   const [loadingModalVisible, setLoadingModalVisible] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [scrollPromptVisible, setScrollPromptVisible] = useState(false);
+  const [Price, setPrice] = useState();
 
   const scrollViewRef = useRef(null);
 
@@ -74,6 +74,37 @@ const App = () => {
       description: "Multiple language support",
     },
   ];
+
+
+  useEffect(()=>{
+    const getPrice = async() =>{
+      
+    try {
+      const response = await fetch(`${ENDPOINT}/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `HTTP error! Status: ${response.status}, Message: ${errorText}`
+        );
+      }
+
+      const result = await response.json();
+      console.log(result);
+      setPrice(result.price);
+    } catch (error) {
+      console.error("Getting Price failed:", error);
+    }
+    }
+
+    getPrice();
+
+  }, [])
 
   const handleOpenModal = () => {
     setShowPaymentModal(true);
@@ -155,7 +186,7 @@ const App = () => {
           setShowPaymentModal(false);
           Alert.alert(
             "Payment Verified",
-            `Payment of $5.00 from ${paymentReference} has been verified.`
+            `Payment of ${Price} from ${paymentReference} has been verified.`
           );
         } else if (result.status === 202) {
           setLoading(true);
@@ -197,39 +228,6 @@ const App = () => {
     pollPaymentStatus();
   };
 
-  //   const title = "Project";
-  //   const full = `
-  //     <!DOCTYPE html>
-  //     <html>
-  //     <head>
-  //       <meta charset="UTF-8">
-  //       <title>${title}</title>
-  //       <style>
-  //         body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
-  //         h1 { color:rgb(0, 0, 0); }
-  //         h2 { color:rgb(0, 0, 0); }
-  //         p { margin-bottom: 15px; }
-  //       </style>
-  //     </head>
-  //     <body>
-  //       <h1>${title}</h1>
-  //       ${generatedPaper.replace(/#/g, '<h2>').replace(/##/g, '<h3>').replace(/\n/g, '<br>')}
-  //     </body>
-  //     </html>
-  //   `;
-
-  //   const path = `${RNFS.DocumentDirectoryPath}/${title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.doc`;
-  //   console.log("log1", path);
-  //   try {
-  //     console.log("log1", path);
-  //     await RNFS.writeFile(path, full, 'utf8');
-  //     Alert.alert("Success", "Document saved successfully!");
-  //     setShowSessionModal(true)
-  //   } catch (error) {
-  //     console.error(error);
-  //     Alert.alert("Error", "Failed to save the document.");
-  //   }
-  // };
 
   const onDownload = async () => {
     const title = "Project";
@@ -285,214 +283,7 @@ const App = () => {
     }
   };
 
-  // const generatePaper2 = () => {
-  //   if (!paymentVerified) {
-  //     Alert.alert("Payment Required", "Please complete payment first");
-  //     return;
-  //   }
-
-  //   setLoading(true);
-
-  //   ///////////////////////
-
-  //   const paperContent = `
-  //   <h1>${problemType} Solution Project</h1>
-
-  //   <h2>Chapter 1: Problem Identification</h2>
-  //   <h3>1.1 Problem Description</h3>
-  //   <p>${problemType} is a significant challenge affecting ${affectedArea}. Many young people turn to substances as a means of coping with stress, peer pressure, or emotional issues.</p>
-
-  //   <h3>1.2 Statement of Intent</h3>
-  //   <p>This project aims to reduce cases of ${problemType} among students by introducing natural remedies that provide similar pleasurable effects without the harmful consequences.</p>
-
-  //   <h3>1.3 Main Idea (Theme/Topic)</h3>
-  //   <p>The main idea of this project is to create a program that encourages the use of natural remedies as alternatives to drugs and substances.</p>
-
-  //   <h3>1.4 Design Specifications</h3>
-  //   <ul>
-  //     <li>Health Benefits: Focus on the nutritional and therapeutic properties.</li>
-  //     <li>Accessibility: Ensure that ingredients are readily available and affordable.</li>
-  //     <li>Education: Provide workshops and informational sessions.</li>
-  //     <li>Engagement: Involve students in the preparation and consumption.</li>
-  //   </ul>
-
-  //   <h2>Chapter 2: Investigation of Related Ideas</h2>
-  //   <h3>2.1 Understanding the Problem</h3>
-  //   <p>Research indicates that substance abuse is linked to various factors, including mental health issues and social pressures.</p>
-
-  //   <h3>2.2 Existing Solutions</h3>
-  //   <p>Current interventions often involve counseling and rehabilitation programs, which may not address immediate cravings.</p>
-
-  //   <h3>2.3 Gaps in the Literature</h3>
-  //   <p>There is a lack of practical applications targeting substance abuse in adolescents.</p>
-
-  //   <h2>Chapter 3: Generation of Ideas</h2>
-  //   <h3>3.1 Modification of Existing Solutions</h3>
-  //   <p>This project will modify existing strategies by incorporating natural remedies.</p>
-
-  //   <h3>3.2 Creation of New Ideas</h3>
-  //   <ul>
-  //     <li>Natural Remedy Workshops: Sessions focused on preparing enjoyable snacks.</li>
-  //     <li>Awareness Campaigns: Materials highlighting benefits of natural remedies.</li>
-  //   </ul>
-
-  //   <h3>3.3 Analysis of Possible Ideas</h3>
-  //   <p>Advantages and disadvantages of proposed ideas will be analyzed.</p>
-
-  //   <h3>3.4 Presentation of Possible Solutions</h3>
-  //   <p>Solutions will be presented in community meetings and demonstrations.</p>
-
-  //   <h2>Chapter 4: Development of Idea</h2>
-  //   <h3>4.1 Selection of the Best Idea</h3>
-  //   <p>The selected idea includes regular workshops and recipe booklets.</p>
-
-  //   <h3>4.2 Refinement of the Chosen Idea</h3>
-  //   <p>The initiative will be refined through collaboration with nutritionists.</p>
-
-  //   <h3>4.3 Experimentation and Testing</h3>
-  //   <p>The refined program will be tested through initial workshops.</p>
-
-  //   <h2>Chapter 5: Presentation of Results</h2>
-  //   <h3>5.1 Final Solution</h3>
-  //   <p>The final solution consists of workshops and educational materials.</p>
-
-  //   <h3>5.2 Evaluation of the Final Solution</h3>
-  //   <p>Effectiveness will be evaluated based on knowledge improvement and behavioral changes.</p>
-
-  //   <h2>Chapter 6: Evaluation and Recommendations</h2>
-  //   <h3>6.1 Achievements and Challenges</h3>
-  //   <p>Achievements include raising awareness; challenges include ongoing cravings.</p>
-
-  //   <h3>6.2 Recommendations for Further Improvement</h3>
-  //   <ul>
-  //     <li>Continued support groups for students.</li>
-  //     <li>Expansion of workshops.</li>
-  //     <li>Collaboration with health professionals.</li>
-  //   </ul>
-
-  //   <h2>Conclusion</h2>
-  //   <p>This project demonstrates that utilizing natural remedies can effectively reduce substance abuse.</p>
-  // `;
-
-  //   ////////////////////
-
-  //   setTimeout(() => {
-  //     const content = generatePaperContent();
-  //     setGeneratedPaper(paperContent);
-  //     setLoading(false);
-  //   }, 1500);
-  // };
-
-  // const generatePaper = () => {
-  //   if (!paymentVerified) {
-  //     Alert.alert("Payment Required", "Please complete payment first");
-  //     return;
-  //   }
-
-  //   setLoading(true);
-
-  //   const paperContent = `
-  //     <h1>${problemType} Solution Project</h1>
-  //     <h2>Chapter 1: Problem Identification</h2>
-  //     <h3>1.1 Problem Description</h3>
-  //     <p>${problemType} is a significant challenge affecting ${affectedArea}. Many young people turn to substances as a means of coping with stress, peer pressure, or emotional issues.</p>
-  //     <h3>1.2 Statement of Intent</h3>
-  //     <p>This project aims to reduce cases of ${problemType} among students by introducing natural remedies.</p>
-  //     <h3>1.3 Main Idea (Theme/Topic)</h3>
-  //     <p>The main idea is to create a program that encourages the use of natural remedies.</p>
-  //     <h3>1.4 Design Specifications</h3>
-  //     <ul>
-  //       <li>Health Benefits: Focus on nutritional properties.</li>
-  //       <li>Accessibility: Ensure ingredients are available.</li>
-  //       <li>Education: Provide workshops.</li>
-  //       <li>Engagement: Involve students in preparation.</li>
-  //     </ul>
-  //     <h2>Chapter 2: Investigation of Related Ideas</h2>
-  //     <h3>2.1 Understanding the Problem</h3>
-  //     <p>Research indicates that substance abuse is linked to various factors.</p>
-  //     <h2>Chapter 3: Generation of Ideas</h2>
-  //     <h3>3.1 Modification of Existing Solutions</h3>
-  //     <p>This project will modify existing strategies.</p>
-  //     <h2>Chapter 4: Development of Idea</h2>
-  //     <h3>4.1 Selection of the Best Idea</h3>
-  //     <p>The selected idea includes workshops.</p>
-  //     <h2>Chapter 5: Presentation of Results</h2>
-  //     <h3>5.1 Final Solution</h3>
-  //     <p>The final solution consists of workshops.</p>
-  //     <h2>Chapter 6: Evaluation and Recommendations</h2>
-  //     <h3>6.1 Achievements and Challenges</h3>
-  //     <p>Achievements include raising awareness.</p>
-  //     <h2>Conclusion</h2>
-  //     <p>Utilizing natural remedies can effectively reduce substance abuse.</p>
-  //   `;
-
-  //   setTimeout(() => {
-  //     setGeneratedPaper(generatedContent);
-  //     setLoading(false);
-  //   }, 1500);
-  // };
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  // const generateProjectTitle = async (problemType, affectedArea, possibleSolution) => {
-  //   const prompt = `Generate a project title for reducing drug and substance abuse at an academy using natural remedies. Problem Type: ${problemType}, Affected Area: ${affectedArea}, Proposed Solution: ${possibleSolution}.`;
-
-  //   try {
-  //     const response = await axios.get(
-  //       'https://api.deepseek.com/v1/generate', // Adjust the URL based on DeepSeek's documentation
-  //       {
-  //         prompt: prompt,
-  //         // Add any other parameters as required
-  //       },
-  //       {
-  //         headers: {
-  //           'Authorization': `Bearer sk-7a39ef59f4b14803a0d803aa3b68a0b8`, // Ensure your API key is correct
-  //           'Content-Type': 'application/json',
-  //         },
-  //       }
-  //     );
-
-  //     return response.data.result; // Adjust based on the actual response structure
-  //   } catch (error) {
-  //     console.error('Error generating project title:', error);
-  //     throw new Error('Failed to generate project title.');
-  //   }
-  // };
-
-  // const generateProjectBody = async (values) => {
-  //   const { problemDescription, intent, mainIdea, designSpecifications } = values;
-
-  // const prompt = `
-  //   Write a detailed project body for the following:
-  //   Problem Description: ${problemDescription}
-  //   Statement of Intent: ${intent}
-  //   Main Idea: ${mainIdea}
-  //   Design Specifications: ${designSpecifications}
-  //   Include chapters and sections as provided in the template.
-  // `;
-
-  //   try {
-  //     const response = await axios.get(
-  //       'https://api.deepseek.com/chat/completions', // Use the correct endpoint
-  //       {
-  //         prompt: prompt,
-  //         // Include any additional parameters as required
-  //       },
-  //       {
-  //         headers: {
-  //           'Authorization': `Bearer sk-7a39ef59f4b14803a0d803aa3b68a0b8`, // Ensure your API key is correct
-  //           'Content-Type': 'application/json',
-  //         },
-  //       }
-  //     );
-
-  //     return response.data.result; // Adjust based on the actual response structure
-  //   } catch (error) {
-  //     console.error('Error generating project body:', error);
-  //     throw new Error('Failed to generate project body.');
-  //   }
-  // };
-
+  
   const generateContent = async (values) => {
     try {
       setButtonDisabled(true);
@@ -803,7 +594,7 @@ const App = () => {
             />
 
             <Text style={styles.paymentDetails}>
-              Paying Amount: $5.00 for the Document
+              Paying Amount: ${Price} for the Document
             </Text>
 
             <TouchableOpacity
